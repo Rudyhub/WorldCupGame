@@ -109,6 +109,61 @@ body{
     opacity: 0;
 }
 
+.scene-2{
+    background: url("../img/bg201.jpg") no-repeat center top;
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+}
+.ball201{
+    display: block;
+    position: absolute;
+    width: 13.8%;
+    margin: auto;
+    bottom: 10%;
+    left: 0;
+    right: 0;
+    z-index: 3;
+}
+.ball201-shadow{
+    display: block;
+    position: absolute;
+    width: 10%;
+    height: 0;
+    margin: auto;
+    bottom: 10%;
+    left: 0;
+    right: 0;
+    -webkit-box-shadow: 0 0 20px 8px #185022;
+    -moz-box-shadow: 0 0 20px 8px #185022;
+    box-shadow: 0 0 20px 8px #185022;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    z-index: 2;
+    background: #185022;
+}
+.player{
+    position: absolute;
+    bottom: 53%;
+}
+.player201{
+    width: 34%;
+    margin: auto;
+    left: 0;
+    right: 0;
+}
+.pointer201{
+    position: absolute;
+    width: 31.25%;
+    top: 86%;
+    left: 50%;
+    z-index: 5;
+}
+.on .pointer201{
+    -webkit-animation: beating 1s infinite linear;
+    animation: beating 1s infinite linear;
+}
+
 .scene-3{
     background: url("../img/bg301.jpg") no-repeat center top;
     -webkit-background-size: cover;
@@ -188,4 +243,9 @@ body{
     animation: fly-from-far 1s 1.8s;
     -webkit-animation-fill-mode: forwards;
     animation-fill-mode: forwards;
+}
+
+.rotating{
+    -webkit-animation: rotating .5s infinite linear;
+    animation: rotating .5s infinite linear;
 }
