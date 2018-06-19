@@ -98,7 +98,7 @@ function ballMotion(dis){
         shadowExt = 8,
         width = 13.8,
         widthStep = ((dis-10)*5/44) / (duration / t),
-        a = (speed - dis / duration)*2 / duration, //加速度
+        a = (speed - dis / duration)*2 / duration, 
         timer;
 
     utils.addClass(ball201, 'rotating');
