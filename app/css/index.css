@@ -95,8 +95,8 @@ body{
     animation: beating .8s infinite linear 2.4s;
 }
 .on .p104{
-    -webkit-animation: jump .8s 1.8s;
-    animation: jump .8s 1.8s;
+    -webkit-animation: jump-from-bottom .8s 1.8s;
+    animation: jump-from-bottom .8s 1.8s;
     -webkit-animation-fill-mode: forwards;
     animation-fill-mode: forwards;
 }
@@ -118,40 +118,46 @@ body{
     display: block;
     position: absolute;
     width: 13.8%;
-    margin: auto;
     bottom: 10%;
-    left: 0;
-    right: 0;
+    left: 43.1%;
     z-index: 3;
 }
-.ball201-shadow{
-    display: block;
+.score201,
+.clock201 {
     position: absolute;
-    width: 10%;
-    height: 0;
-    margin: auto;
-    bottom: 10%;
-    left: 0;
-    right: 0;
-    -webkit-box-shadow: 0 0 20px 8px #185022;
-    -moz-box-shadow: 0 0 20px 8px #185022;
-    box-shadow: 0 0 20px 8px #185022;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    z-index: 2;
-    background: #185022;
+    top: 0;
+    font-size: 18px;
+    color: #068042;
+    margin: 0 .3em;
 }
+.score201{
+    left: 0;
+}
+.clock201{
+    right: 0;
+}
+
 .player{
     position: absolute;
     bottom: 53%;
+    opacity: 0;
 }
 .player201{
     width: 34%;
-    margin: auto;
-    left: 0;
-    right: 0;
+    left: 33%;
 }
+.player202{
+    width: 45%;
+    left: 27.5%;
+}
+.player203{
+    width: 15%;
+    left: 42.5%;
+}
+.player.on{
+    opacity: 1;
+}
+
 .pointer201{
     position: absolute;
     width: 31.25%;
@@ -248,4 +254,75 @@ body{
 .rotating{
     -webkit-animation: rotating .5s infinite linear;
     animation: rotating .5s infinite linear;
+}
+
+
+.jump-right-80{
+    -webkit-animation: jump-right-80 .5s;
+    animation: jump-right-80 .5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    -webkit-transform-origin: bottom right;
+    transform-origin: bottom right;
+}
+.jump-left-80{
+    -webkit-animation: jump-left-80 .5s;
+    animation: jump-left-80 .5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    -webkit-transform-origin: bottom left;
+    transform-origin: bottom left;
+}
+.jump-right-60{
+    -webkit-animation: jump-right-60 .5s;
+    animation: jump-right-60 .5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    -webkit-transform-origin: bottom right;
+    transform-origin: bottom right;
+}
+.jump-left-60{
+    -webkit-animation: jump-left-60 .5s;
+    animation: jump-left-60 .5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    -webkit-transform-origin: bottom left;
+    transform-origin: bottom left;
+}
+.jump-right-30{
+    -webkit-animation: jump-right-30 .5s;
+    animation: jump-right-30 .5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    -webkit-transform-origin: bottom right;
+    transform-origin: bottom right;
+}
+.jump-left-30{
+    -webkit-animation: jump-left-30 .5s;
+    animation: jump-left-30 .5s;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    -webkit-transform-origin: bottom left;
+    transform-origin: bottom left;
+}
+
+.dialog{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .5);
+    display: none;
+    top: 0;
+    left: 0;
+}
+.dialog.loading{
+    display: table;
+}
+
+.dialog-inner{
+    display: table-cell;
+    font-size: 30px;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
 }
