@@ -294,6 +294,41 @@ function main(){
         function pointsDis(p1, p2){
             return Math.sqrt((p2[0] - p1[0]) * (p2[0] - p1[0]) + (p2[1] - p1[1]) * (p2[1] - p1[1]));
         }
+        //求多边形顶点与圆心最近的点
+        function nearestPoint(c, points){
+            var dis = [];
+            for(var i=0, len=points.length; i<len; i++){
+                dis.push({
+                    index: i,
+                    val: pointsDis(c, points[i])
+                });
+            }
+            dis.sort(function (a, b) {
+                return a.val - b.val;
+            });
+            return points[dis[0].index];
+        }
+        //p点到经过p1,p2直线的投影点
+        function shadowPoint(p, p1, p2){
+            // 两点直线公式 y = k*x + b;
+            var k = (p2[1] - p1[1]) / (p2[0] - p1[0]),
+                b = p1[1] - k * p1[0],
+                x, y;
+
+            x = (k*(p[1] - b) + p[0]) / (k*k + 1);
+            y = k*x + b;
+            return [x, y];
+        }
+
+        //
+        // function fn(c, points) {
+        //     var ps = [];
+        //     for(var i=0, len=points.length; i<len; i++){
+        //         ps.push(shadowPoint(points[i], c, nearestPoint(c, points)));
+        //     }
+        //     return ps;
+        // }
+
     }
 
 }
