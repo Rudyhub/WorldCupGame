@@ -108,7 +108,7 @@ function main(){
     }
 
     function ready(){
-        turnScene(0);
+        turnScene(1);
         var btn101 = document.getElementById('btn101');
         btn101.onclick = function(){
             turnScene(1);
@@ -190,6 +190,7 @@ function main(){
                 stat = deg === 0 ? 0 : 2;
             }else{
                 stat = 0;
+                deg = 0;
             }
 
             motion(x, y);
@@ -211,9 +212,44 @@ function main(){
                     utils.removeClass(ball201, 'rotating');
                     var bw = ball201.offsetWidth,
                         vW = ball201.parentNode.offsetWidth,
-                        vH = ball201.parentNode.offsetHeight;
+                        vH = ball201.parentNode.offsetHeight,
+                        gx = vW * .875 - bw,
+                        gy = vH * 0.46 - bw,
+                        gd = vH * .18,
+                        gr = vW * .125;
                     //先判断球在球门区域
-                    if(top < vH * 0.46 - bw && top > vH * .18 && left > vW * .125 && left < vW * .875 - bw){
+                    if(top < gy && top > gd && left > gr && left < gx){
+                        var cv = document.getElementById('cv'),
+                            ctx = cv.getContext('2d'),
+                            binfo = ball201.getBoundingClientRect(),
+                            bimg = new Image(),
+                            pimg = new Image(),
+                            dir = stat === 1 ? -1 : 1;
+                        cv.width = vW;
+                        cv.height = vH;
+
+                        bimg.src = ball201.src;
+                        pimg.src = player203.src;
+
+                        console.log(deg);
+                        ctx.drawImage(bimg,binfo.left,binfo.top,bw,ball201.offsetHeight);
+                        var ox = player203.offsetLeft+player203.offsetWidth/2, oy = player203.offsetTop+player203.offsetHeight;
+                        ctx.translate(ox, oy);
+                        ctx.rotate(dir*Math.PI*deg/180);
+                        ctx.translate(-ox,-oy);
+                        ctx.globalCompositeOperation="source-in";
+                        ctx.drawImage(pimg,player203.offsetLeft, player203.offsetTop, player203.offsetWidth, player203.offsetHeight);
+
+                        var pixs = ctx.getImageData(gx,gy,gr-gx,gd-gy);
+                        for (var i=0, pixLen = pixs.data.length;i<pixLen;i+=4)
+                        {
+                            if(pixs.data[i+3] !== 0){
+                                console.log('碰');
+                                break;
+                            }
+                        }
+
+                        /*
                         //先判断球与守门员位置关系，利用矩形与圆的位置关系，进行碰撞算法
                         var pt = player203.offsetTop,
                             pl = player203.offsetLeft,
@@ -247,11 +283,12 @@ function main(){
                             // console.log(point1, point2, point3, point4);
 
                         }
+                        */
                     }
-                    timer = setTimeout( function(){
-                        clearTimeout(timer);
-                        playerReady();
-                    }, 500);
+                    // timer = setTimeout( function(){
+                    //     clearTimeout(timer);
+                    //     playerReady();
+                    // }, 500);
                 }
                 x *= .9;
                 y *= .9;
@@ -271,7 +308,7 @@ function main(){
             if(countTime <= 0){
                 clearInterval(clock);
                 //game over
-                turnScene(2);
+                // turnScene(2);
                 countTime = 0;
             }else{
                 clock201.innerText = countTime/1000;

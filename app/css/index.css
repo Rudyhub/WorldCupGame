@@ -260,50 +260,32 @@ body{
 .jump-right-80{
     -webkit-animation: jump-right-80 .5s;
     animation: jump-right-80 .5s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-transform-origin: bottom right;
-    transform-origin: bottom right;
 }
 .jump-left-80{
     -webkit-animation: jump-left-80 .5s;
     animation: jump-left-80 .5s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-transform-origin: bottom left;
-    transform-origin: bottom left;
 }
 .jump-right-60{
     -webkit-animation: jump-right-60 .5s;
     animation: jump-right-60 .5s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-transform-origin: bottom right;
-    transform-origin: bottom right;
 }
 .jump-left-60{
     -webkit-animation: jump-left-60 .5s;
     animation: jump-left-60 .5s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-transform-origin: bottom left;
-    transform-origin: bottom left;
 }
 .jump-right-30{
     -webkit-animation: jump-right-30 .5s;
     animation: jump-right-30 .5s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-transform-origin: bottom right;
-    transform-origin: bottom right;
 }
 .jump-left-30{
     -webkit-animation: jump-left-30 .5s;
     animation: jump-left-30 .5s;
+}
+.jump-stat{
     -webkit-animation-fill-mode: forwards;
     animation-fill-mode: forwards;
-    -webkit-transform-origin: bottom left;
-    transform-origin: bottom left;
+    -webkit-transform-origin: bottom center;
+    transform-origin: bottom center;
 }
 
 .dialog{
