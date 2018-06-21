@@ -315,14 +315,20 @@ body{
     display: none;
     top: 0;
     left: 0;
+    font-size: 20px;
+    z-index: 100;
 }
-.dialog.loading{
+.dialog.show{
     display: table;
+}
+.dialog span{
+    display: inline-block;
+    text-align: left;
+    padding: .5em;
 }
 
 .dialog-inner{
     display: table-cell;
-    font-size: 30px;
     color: #fff;
     text-align: center;
     vertical-align: middle;

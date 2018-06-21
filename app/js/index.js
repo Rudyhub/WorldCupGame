@@ -91,17 +91,26 @@ function main(){
         dialogIn = dialog.querySelector('.dialog-inner'),
         scene = [document.getElementById('scene1'), document.getElementById('scene2'), document.getElementById('scene3')];
 
+    dialog.onclick = function (e) {
+        if(e.target === dialog || e.target === dialogIn)
+            utils.removeClass(dialog, 'show');
+    };
+    if(!utils.isTouch()){
+        dialogIn.innerHTML = '<span>設備不支持，無法進行遊戲！</span>';
+        utils.addClass(dialog, 'show');
+        return;
+    }
 
-    utils.addClass(dialog, 'loading');
+    utils.addClass(dialog, 'show');
+
     utils.imgLoaded(imgs, function(cur, total){
         if(cur === total){
-            utils.removeClass(dialog, 'loading');
+            utils.removeClass(dialog, 'show');
             ready();
         }else{
             dialogIn.innerHTML = Math.round(cur/total * 100) + '%';
         }
     });
-
 
     function turnScene(index){
         for(var i=0; i<3; i++){
@@ -126,7 +135,9 @@ function main(){
             clock201 = document.getElementById('clock201'),
             score201 = document.getElementById('score201'),
             goal201 = document.getElementById('goal201'),
+            pointer201 = document.getElementById('pointer201'),
             cv = document.getElementById('cv'),
+            statTxt302 = document.getElementById('statTxt302'),
             player203Cls = player203.className,
             deg = 0,
             stat = 0,//守门员扑员状态，0:中间直站，1:左倾，2:右倾
@@ -149,7 +160,9 @@ function main(){
             pscore = 0;
             uscore = 0;
             score201.innerText = '0:0';
+            clock201.innerText = timeLimit/1000;
             countTime = timeLimit;
+            utils.removeClass(pointer201, 'hide');
             reStat();
         }
 
@@ -232,7 +245,10 @@ function main(){
 
             motion(x, y);
 
-            if(countTime === timeLimit) clock = setInterval(clockFn, 1000);
+            if(countTime === timeLimit) {
+                clock = setInterval(clockFn, 1000);
+                utils.addClass(pointer201, 'hide');
+            }
         }
 
         function motion(x, y){
@@ -323,12 +339,32 @@ function main(){
         }
 
         var score301 = document.getElementById('score301'),
-            rank301 = document.getElementById('rank301');
+            rank301 = document.getElementById('rank301'),
+            again301 = document.getElementById('again301'),
+            share301 = document.getElementById('share301');
         function gameOver(){
             score301.innerText = uscore;
-            rank301.innerText = 1;
+            rank301.innerText = '';
+            if(uscore <= 0){
+                statTxt302.src = 'img/p303.png';
+            }else{
+                statTxt302.src = 'img/p302.png';
+            }
         }
 
+        again301.onclick = function () {
+            readyStart();
+            turnScene(1);
+        };
+
+        share301.onclick = function(){
+            if(/MicroMessenger/i.test(window.navigator.userAgent)){
+                dialogIn.innerHTML = '<span>請點擊微信右上角菜單選擇分享。</span>';
+            }else{
+                dialogIn.innerHTML = '<span>請點擊瀏覽分享菜單進行分享。</span>';
+            }
+            utils.addClass(dialog, 'show');
+        }
     }
 
 }
