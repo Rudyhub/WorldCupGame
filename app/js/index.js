@@ -139,6 +139,7 @@ function main(){
             cv = document.getElementById('cv'),
             statTxt302 = document.getElementById('statTxt302'),
             player203Cls = player203.className,
+            kickAudio = new Audio(),
             deg = 0,
             stat = 0,//守门员扑员状态，0:中间直站，1:左倾，2:右倾
             clock = null,
@@ -151,7 +152,9 @@ function main(){
             pw202 = player202.offsetWidth,
             pw203 = player203.offsetWidth;
 
+
         btn101.onclick = function(){
+            kickAudio.src = 'audio/kick.mp3';
             turnScene(1);
             readyStart();
         };
@@ -244,6 +247,12 @@ function main(){
             }
 
             motion(x, y);
+
+            if(!kickAudio.paused){
+                kickAudio.pause();
+                kickAudio.currentTime = 0;
+            }
+            kickAudio.play();
 
             if(countTime === timeLimit) {
                 clock = setInterval(clockFn, 1000);
