@@ -71,6 +71,14 @@ var utils = {
                 img.src = 'img/'+arr[i];
             })(i);
         }
+    },
+    noOpacity(data){
+        for (var i=0, pixLen = data.length;i<pixLen;i+=4){
+            if(data[i+3] !== 0){
+                return true;
+            }
+        }
+        return false;
     }
 };
 
@@ -108,26 +116,52 @@ function main(){
     }
 
     function ready(){
-        turnScene(1);
-        var btn101 = document.getElementById('btn101');
-        btn101.onclick = function(){
-            turnScene(1);
-        };
+        turnScene(0);
 
-        var ball201 = document.getElementById('ball201'),
+        var btn101 = document.getElementById('btn101'),
+            ball201 = document.getElementById('ball201'),
             player201 = document.getElementById('player201'),
             player202 = document.getElementById('player202'),
             player203 = document.getElementById('player203'),
+            clock201 = document.getElementById('clock201'),
+            score201 = document.getElementById('score201'),
+            goal201 = document.getElementById('goal201'),
+            cv = document.getElementById('cv'),
             player203Cls = player203.className,
             deg = 0,
             stat = 0,//守门员扑员状态，0:中间直站，1:左倾，2:右倾
-            clock201 = document.getElementById('clock201'),
-            score201 = document.getElementById('score201'),
             clock = null,
             timeLimit = 10000,
-            countTime = timeLimit;
+            countTime = timeLimit,
+            pscore = 0,
+            uscore = 0,
+            speedY = [],
+            speedX = [],
+            pw202 = player202.offsetWidth,
+            pw203 = player203.offsetWidth;
 
-        var speedY = [], speedX = [];
+        btn101.onclick = function(){
+            turnScene(1);
+            readyStart();
+        };
+
+        function readyStart(){
+            pscore = 0;
+            uscore = 0;
+            score201.innerText = '0:0';
+            countTime = timeLimit;
+            reStat();
+        }
+
+        function reStat(){
+            utils.addEvent(ball201, 'touchstart', startFn);
+            utils.addClass(player201, 'on');
+            utils.removeClass(player202, 'on');
+            player203.className = player203Cls;
+            player202.removeAttribute('style');
+            player203.removeAttribute('style');
+            ball201.removeAttribute('style');
+        }
 
         function startFn() {
             utils.removeEvent(ball201, 'touchstart', startFn);
@@ -140,7 +174,10 @@ function main(){
             utils.addEvent(document, 'touchmove', moveFn);
             utils.addEvent(document, 'touchend', endFn);
         }
+
         function moveFn(e){
+            player202.style.left = e.targetTouches[0].clientX - pw202/2 + 'px';
+            player203.style.left = e.targetTouches[0].clientX -pw203/2 + 'px';
             speedX.push(e.targetTouches[0].clientX);
             speedY.push(e.targetTouches[0].clientY);
         }
@@ -213,82 +250,53 @@ function main(){
                     var bw = ball201.offsetWidth,
                         vW = ball201.parentNode.offsetWidth,
                         vH = ball201.parentNode.offsetHeight,
-                        gx = vW * .875 - bw,
-                        gy = vH * 0.46 - bw,
-                        gd = vH * .18,
-                        gr = vW * .125;
+                        gl = goal201.offsetLeft,
+                        gt = goal201.offsetTop,
+                        gw = goal201.offsetWidth,
+                        gh = goal201.offsetHeight;
                     //先判断球在球门区域
-                    if(top < gy && top > gd && left > gr && left < gx){
-                        var cv = document.getElementById('cv'),
-                            ctx = cv.getContext('2d'),
+                    if(left>gl && left<gl+gw-bw && top>gt && top<gt+gh-bw){
+                        var ctx = cv.getContext('2d'),
                             binfo = ball201.getBoundingClientRect(),
+                            pl = player203.offsetLeft,
+                            pt = player203.offsetTop,
+                            pw = player203.offsetWidth,
+                            ph = player203.offsetHeight,
                             bimg = new Image(),
                             pimg = new Image(),
-                            dir = stat === 1 ? -1 : 1;
+                            ox = pl+pw/2,
+                            oy = pt+ph,
+                            dir = stat === 1 ? -1 : 1,
+                            pixs;
+
                         cv.width = vW;
                         cv.height = vH;
 
                         bimg.src = ball201.src;
                         pimg.src = player203.src;
 
-                        console.log(deg);
                         ctx.drawImage(bimg,binfo.left,binfo.top,bw,ball201.offsetHeight);
-                        var ox = player203.offsetLeft+player203.offsetWidth/2, oy = player203.offsetTop+player203.offsetHeight;
                         ctx.translate(ox, oy);
                         ctx.rotate(dir*Math.PI*deg/180);
                         ctx.translate(-ox,-oy);
                         ctx.globalCompositeOperation="source-in";
-                        ctx.drawImage(pimg,player203.offsetLeft, player203.offsetTop, player203.offsetWidth, player203.offsetHeight);
+                        ctx.drawImage(pimg, pl, pt, pw,ph);
 
-                        var pixs = ctx.getImageData(gx,gy,gr-gx,gd-gy);
-                        for (var i=0, pixLen = pixs.data.length;i<pixLen;i+=4)
-                        {
-                            if(pixs.data[i+3] !== 0){
-                                console.log('碰');
-                                break;
-                            }
-                        }
-
-                        /*
-                        //先判断球与守门员位置关系，利用矩形与圆的位置关系，进行碰撞算法
-                        var pt = player203.offsetTop,
-                            pl = player203.offsetLeft,
-                            pw = player203.offsetWidth,
-                            ph = player203.offsetHeight,
-                            bt = ball201.offsetTop,
-                            bl = ball201.offsetLeft,
-                            bh = ball201.offsetHeight,
-                            br = bw/2;
-
-                        if(stat === 0){
-                            if(bl < pl - bw || bl > pl + pw || bt < pt - bh || bt > pt + ph){
-                                console.log('进球')
-                            }else{
-                                console.log('防下');
-                            }
+                        pixs = ctx.getImageData(gl, gt, gw, gh);
+                        if(utils.noOpacity(pixs.data)){
+                            pscore++;
                         }else{
-                            //计算矩形四个顶点
-                            var point1, point2, point3, point4;
-                            if(stat === 1){
-                                point4 = [pl, pt + ph];
-                                point1 = [point4[0] - Math.cos(Math.PI*(90-deg)/180) * ph, point4[1] - Math.sin(Math.PI*(90-deg)/180) * ph];
-                                point3 = [Math.cos(Math.PI*deg/180) * pw + point4[0], point4[1] - Math.sin(Math.PI*deg/180) * pw];
-                                point2 = [point3[0] - Math.sin(Math.PI*deg/180) * ph, point3[1] - Math.cos(Math.PI*deg/180) * ph];
-                            }else if(stat === 2){
-                                point3 = [pl+pw, pt+ph];
-                                point4 = [point3[0] - Math.cos(Math.PI*deg/180)*pw, point3[1] - Math.sin(Math.PI*deg/180)*pw];
-                                point2 = [Math.cos(Math.PI*(90-deg)/180)*ph + point3[0], point3[1] - Math.sin(Math.PI*(90-deg)/180)*ph];
-                                point1 = [point4[0] + Math.sin(Math.PI*deg/180) * ph, point4[1] - Math.cos(Math.PI*deg/180) * ph];
-                            }
-                            // console.log(point1, point2, point3, point4);
-
+                            uscore++;
                         }
-                        */
+                    }else{
+                        pscore++;
                     }
-                    // timer = setTimeout( function(){
-                    //     clearTimeout(timer);
-                    //     playerReady();
-                    // }, 500);
+                    score201.innerText = uscore + ':' + pscore;
+
+                    timer = setTimeout( function(){
+                        clearTimeout(timer);
+                        reStat();
+                    }, 200);
                 }
                 x *= .9;
                 y *= .9;
@@ -304,67 +312,22 @@ function main(){
 
         function clockFn(){
             countTime -= 1000;
-            console.log(countTime)
             if(countTime <= 0){
                 clearInterval(clock);
-                //game over
-                // turnScene(2);
+                turnScene(2);
+                gameOver();
                 countTime = 0;
             }else{
                 clock201.innerText = countTime/1000;
             }
         }
 
-        function playerReady(){
-            utils.addEvent(ball201, 'touchstart', startFn);
-            utils.addClass(player201, 'on');
-            utils.removeClass(player202, 'on');
-            player203.className = player203Cls;
-            player202.removeAttribute('style');
-            player203.removeAttribute('style');
-            ball201.removeAttribute('style');
+        var score301 = document.getElementById('score301'),
+            rank301 = document.getElementById('rank301');
+        function gameOver(){
+            score301.innerText = uscore;
+            rank301.innerText = 1;
         }
-
-        playerReady();
-
-        // 计算两点之间的距离
-        function pointsDis(p1, p2){
-            return Math.sqrt((p2[0] - p1[0]) * (p2[0] - p1[0]) + (p2[1] - p1[1]) * (p2[1] - p1[1]));
-        }
-        //求多边形顶点与圆心最近的点
-        function nearestPoint(c, points){
-            var dis = [];
-            for(var i=0, len=points.length; i<len; i++){
-                dis.push({
-                    index: i,
-                    val: pointsDis(c, points[i])
-                });
-            }
-            dis.sort(function (a, b) {
-                return a.val - b.val;
-            });
-            return points[dis[0].index];
-        }
-        //p点到经过p1,p2直线的投影点
-        function shadowPoint(p, p1, p2){
-            // 两点直线公式 y = k*x + b;
-            var k = (p2[1] - p1[1]) / (p2[0] - p1[0]),
-                b = p1[1] - k * p1[0],
-                x, y;
-
-            x = (k*(p[1] - b) + p[0]) / (k*k + 1);
-            y = k*x + b;
-            return [x, y];
-        }
-
-        //
-        // function fn(c, points) {
-        //     var ps = [];
-        //     for(var i=0, len=points.length; i<len; i++){
-        //         ps.push(shadowPoint(points[i], c, nearestPoint(c, points)));
-        //     }
-        //     return ps;
-        // }
 
     }
 

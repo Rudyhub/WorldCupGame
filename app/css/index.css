@@ -169,6 +169,25 @@ body{
     -webkit-animation: beating 1s infinite linear;
     animation: beating 1s infinite linear;
 }
+.pointer201.hide{
+    display: none;
+}
+.goal201{
+    position: absolute;
+    width: 74%;
+    height: 27.8%;
+    top: 18.5%;
+    left: 13%;
+    opacity: 0;
+}
+#cv{
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    z-index: -1;
+}
+
 
 .scene-3{
     background: url("../img/bg301.jpg") no-repeat center top;
