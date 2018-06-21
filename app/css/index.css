@@ -122,7 +122,9 @@ body{
     left: 43.1%;
     z-index: 3;
 }
-
+.ball201.touch{
+    filter: drop-shadow(0 15px 10px #145629);
+}
 .score201,
 .clock201 {
     position: absolute;
