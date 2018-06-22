@@ -140,6 +140,8 @@ function main(){
             statTxt302 = document.getElementById('statTxt302'),
             player203Cls = player203.className,
             kickAudio = new Audio(),
+            requestFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame,
+            cancelFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame,
             deg = 0,
             stat = 0,//守门员扑员状态，0:中间直站，1:左倾，2:右倾
             clock = null,
@@ -151,7 +153,6 @@ function main(){
             speedX = [],
             pw202 = player202.offsetWidth,
             pw203 = player203.offsetWidth;
-
 
         btn101.onclick = function(){
             kickAudio.src = 'audio/kick.mp3';
@@ -179,13 +180,15 @@ function main(){
             ball201.removeAttribute('style');
         }
 
-        function startFn() {
+        function startFn(e) {
+            e.preventDefault();
             utils.removeEvent(ball201, 'touchstart', startFn);
             speedY.splice(0, speedY.length);
             speedX.splice(0, speedX.length);
 
             utils.addClass(player202, 'on');
             utils.removeClass(player201, 'on');
+            utils.addClass(ball201, 'touch');
 
             utils.addEvent(document, 'touchmove', moveFn);
             utils.addEvent(document, 'touchend', endFn);
@@ -224,6 +227,7 @@ function main(){
             utils.addClass(player203, 'on');
             utils.removeClass(player201, 'on');
             utils.removeClass(player202, 'on');
+            utils.removeClass(ball201, 'touch');
 
             var rand1 = Math.random(), rand2 = Math.random();
             if(rand2 < .25){
@@ -248,10 +252,8 @@ function main(){
 
             motion(x, y);
 
-            if(!kickAudio.paused){
-                kickAudio.pause();
-                kickAudio.currentTime = 0;
-            }
+            kickAudio.pause();
+            kickAudio.currentTime = 0;
             kickAudio.play();
 
             if(countTime === timeLimit) {
@@ -268,9 +270,9 @@ function main(){
 
             utils.addClass(ball201, 'rotating');
 
-            var timer = setInterval(function(){
+            var timer = requestFrame(function re(){
+                cancelFrame(timer);
                 if(top <= 0 || y > -1){
-                    clearInterval(timer);
                     utils.removeClass(ball201, 'rotating');
                     var bw = ball201.offsetWidth,
                         vW = ball201.parentNode.offsetWidth,
@@ -316,12 +318,15 @@ function main(){
                     }else{
                         pscore++;
                     }
-                    score201.innerText = uscore + ':' + pscore;
+                    score201.innerText = uscore;
 
                     timer = setTimeout( function(){
                         clearTimeout(timer);
                         reStat();
+                        if(countTime === 0) gameOver(true);
                     }, 200);
+                }else{
+                    timer = requestFrame(re);
                 }
                 x *= .9;
                 y *= .9;
@@ -332,16 +337,16 @@ function main(){
                 ball201.style.left = left + 'px';
                 ball201.style.top = top + 'px';
                 ball201.style.width = width * (top/yLimit) + 'px';
-            }, 16);
+            });
         }
 
         function clockFn(){
             countTime -= 1000;
             if(countTime <= 0){
                 clearInterval(clock);
-                turnScene(2);
-                gameOver();
                 countTime = 0;
+                clock201.innerText;
+                gameOver();
             }else{
                 clock201.innerText = countTime/1000;
             }
@@ -351,7 +356,8 @@ function main(){
             rank301 = document.getElementById('rank301'),
             again301 = document.getElementById('again301'),
             share301 = document.getElementById('share301');
-        function gameOver(){
+        function gameOver(bool){
+            if(!bool) turnScene(2);
             score301.innerText = uscore;
             rank301.innerText = pscore;
             if(uscore <= 0){
