@@ -353,7 +353,7 @@ function main(){
             share301 = document.getElementById('share301');
         function gameOver(){
             score301.innerText = uscore;
-            rank301.innerText = '';
+            rank301.innerText = pscore;
             if(uscore <= 0){
                 statTxt302.src = 'img/p303.png';
             }else{
