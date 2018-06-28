@@ -82,7 +82,6 @@ var utils = {
     }
 };
 
-
 function main(){
     var imgs = ['again.png','ball.png', 'bg201.jpg','bg301.jpg', 'p101.jpg', 'p102.jpg',
         'p103.png','p104.png','p301.png','p302.png','p303.png', 'player02.png', 'player02.png',
@@ -96,7 +95,7 @@ function main(){
             utils.removeClass(dialog, 'show');
     };
     if(!utils.isTouch()){
-        dialogIn.innerHTML = '<span>設備不支持，無法進行遊戲！</span>';
+        dialogIn.innerHTML = '<span>設備不支持！</span>';
         utils.addClass(dialog, 'show');
         return;
     }
@@ -136,6 +135,7 @@ function main(){
             score201 = document.getElementById('score201'),
             goal201 = document.getElementById('goal201'),
             pointer201 = document.getElementById('pointer201'),
+            steer = document.getElementById('steer'),
             cv = document.getElementById('cv'),
             statTxt302 = document.getElementById('statTxt302'),
             player203Cls = player203.className,
@@ -143,16 +143,26 @@ function main(){
             requestFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame,
             cancelFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame,
             deg = 0,
-            stat = 0,//守门员扑员状态，0:中间直站，1:左倾，2:右倾
+            stat = 0, //守门员扑员状态，0:中间直站，1:左倾，2:右倾
             clock = null,
             timeLimit = 10000,
             countTime = timeLimit,
-            pscore = 0,
-            uscore = 0,
+            pscore = 0, //丢球
+            uscore = 0, //进球
             speedY = [],
             speedX = [],
             pw202 = player202.offsetWidth,
-            pw203 = player203.offsetWidth;
+            pw203 = player203.offsetWidth,
+            ballCenter = [],
+            touchX = 0,
+            touchY = 0,
+            prevent = {passive: false};
+
+        utils.addEvent(document.body, 'touchstart', function(e){
+            if( ball201.parentNode.contains(e.target) && e.target !== ball201){
+                e.preventDefault();
+            }
+        }, prevent);
 
         btn101.onclick = function(){
             kickAudio.src = 'audio/kick.mp3';
@@ -163,7 +173,7 @@ function main(){
         function readyStart(){
             pscore = 0;
             uscore = 0;
-            score201.innerText = '0:0';
+            score201.innerText = '0';
             clock201.innerText = timeLimit/1000;
             countTime = timeLimit;
             utils.removeClass(pointer201, 'hide');
@@ -171,7 +181,7 @@ function main(){
         }
 
         function reStat(){
-            utils.addEvent(ball201, 'touchstart', startFn);
+            utils.addEvent(document, 'touchstart', touchStartFn, prevent);
             utils.addClass(player201, 'on');
             utils.removeClass(player202, 'on');
             player203.className = player203Cls;
@@ -180,29 +190,44 @@ function main(){
             ball201.removeAttribute('style');
         }
 
-        function startFn(e) {
+        function touchStartFn(e) {
+            if(e.target !== ball201) return false;
+            utils.removeEvent(document, 'touchstart', touchStartFn);
             e.preventDefault();
-            utils.removeEvent(ball201, 'touchstart', startFn);
+
             speedY.splice(0, speedY.length);
             speedX.splice(0, speedX.length);
 
             utils.addClass(player202, 'on');
             utils.removeClass(player201, 'on');
-            utils.addClass(ball201, 'touch');
+            utils.removeClass(steer, 'transition-3');
+            utils.addClass(steer, 'touch');
 
-            utils.addEvent(document, 'touchmove', moveFn);
-            utils.addEvent(document, 'touchend', endFn);
+            touchX = e.targetTouches[0].clientX;
+            touchY = e.targetTouches[0].clientY;
+
+            ballCenter[0] = ball201.offsetLeft + ball201.offsetWidth/2;
+            ballCenter[1] = ball201.offsetTop + ball201.offsetHeight/2;
+
+            utils.addEvent(document, 'touchmove', touchMoveFn, prevent);
+            utils.addEvent(document, 'touchend', touchEndFn);
         }
 
-        function moveFn(e){
-            player202.style.left = e.targetTouches[0].clientX - pw202/2 + 'px';
-            player203.style.left = e.targetTouches[0].clientX -pw203/2 + 'px';
-            speedX.push(e.targetTouches[0].clientX);
-            speedY.push(e.targetTouches[0].clientY);
+        function touchMoveFn(e){
+            e.preventDefault();
+            touchX = e.targetTouches[0].clientX;
+            touchY = e.targetTouches[0].clientY;
+
+            player202.style.left = touchX - pw202/2 + 'px';
+            player203.style.left = touchX -pw203/2 + 'px';
+            steer.style.transform = 'rotateZ('+(-Math.atan((touchX-ballCenter[0])/(touchY-ballCenter[1])) * 180 / Math.PI)+'deg)';
+
+            speedX.push(touchX);
+            speedY.push(touchY);
         }
-        function endFn(){
-            utils.removeEvent(document, 'touchmove', moveFn);
-            utils.removeEvent(document, 'touchend', endFn);
+        function touchEndFn(){
+            utils.removeEvent(document, 'touchmove', touchMoveFn);
+            utils.removeEvent(document, 'touchend', touchEndFn);
 
             if(speedX.length > 5) speedX.splice(0, speedX.length-5);
             if(speedY.length > 5) speedY.splice(0, speedY.length-5);
@@ -227,7 +252,8 @@ function main(){
             utils.addClass(player203, 'on');
             utils.removeClass(player201, 'on');
             utils.removeClass(player202, 'on');
-            utils.removeClass(ball201, 'touch');
+            utils.addClass(steer, 'transition-3');
+            utils.removeClass(steer, 'touch');
 
             var rand1 = Math.random(), rand2 = Math.random();
             if(rand2 < .25){
@@ -359,7 +385,7 @@ function main(){
         function gameOver(bool){
             if(!bool) turnScene(2);
             score301.innerText = uscore;
-            rank301.innerText = pscore;
+            rank301.innerText = '';
             if(uscore <= 0){
                 statTxt302.src = 'img/p303.png';
             }else{
