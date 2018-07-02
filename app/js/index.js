@@ -23,9 +23,7 @@ utils.ready(function () {
 
     var btn101 = document.getElementById('btn101'),
         ball201 = document.getElementById('ball201'),
-        player201 = document.getElementById('player201'),
-        player202 = document.getElementById('player202'),
-        player203 = document.getElementById('player203'),
+        goalie = document.querySelectorAll('.goalie'),
         clock201 = document.getElementById('clock201'),
         score201 = document.getElementById('score201'),
         goal201 = document.getElementById('goal201'),
@@ -33,7 +31,7 @@ utils.ready(function () {
         steer = document.getElementById('steer'),
         cv = document.getElementById('cv'),
         statTxt302 = document.getElementById('statTxt302'),
-        player203Cls = player203.className,
+        goalie203Cls = goalie[2].className,
         kickAudio = new Audio(),
         requestFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame,
         cancelFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame,
@@ -42,12 +40,13 @@ utils.ready(function () {
         clock = null,
         timeLimit = 10000,
         countTime = timeLimit,
+        sensitivity = .88,
         pscore = 0, //丢球
         uscore = 0, //进球
         speedY = [],
         speedX = [],
-        pw202 = player202.offsetWidth,
-        pw203 = player203.offsetWidth,
+        pw202 = goalie[1].offsetWidth,
+        pw203 = goalie[2].offsetWidth,
         gl = goal201.offsetLeft,
         gt = goal201.offsetTop,
         gw = goal201.offsetWidth,
@@ -57,6 +56,7 @@ utils.ready(function () {
         touchY = 0,
         prevent = {passive: false};
 
+    //用来阻止移动端浏览器默认的橡皮弹性，尤其iphone
     utils.addEvent(document.body, 'touchstart', function(e){
         if( ball201.parentNode.contains(e.target) && e.target !== ball201){
             e.preventDefault();
@@ -70,6 +70,8 @@ utils.ready(function () {
         readyStart();
     };
 
+    var setting = createSetting();
+
     function readyStart(){
         pscore = 0;
         uscore = 0;
@@ -77,16 +79,62 @@ utils.ready(function () {
         clock201.innerText = timeLimit/1000;
         countTime = timeLimit;
         utils.removeClass(pointer201, 'hide');
+
+        var timeouter = setTimeout(function () {
+            clearTimeout(timeouter);
+            utils.popup({
+                background: 'rgba(0,0,0,.7)',
+                color: '#fff'
+            }).show(setting);
+        },1000);
+
         reStat();
+    }
+
+    function createSetting(){
+        var div = document.createElement('div'),
+            timeSelect = document.createElement('select'),
+            sensSelect = document.createElement('select'),
+            timeOption = [10,20,30,60],
+            sensOption = [0.80,0.82,0.84,0.86,0.88,0.90,0.92,0.94,0.96,0.98],
+            len = 0,
+            i = 0;
+
+        timeSelect.className = sensSelect.className = 'setting-select';
+        div.className = 'popup-inner';
+
+        timeSelect.onchange = function(){
+            timeLimit = parseFloat(this.value)*1000;
+            clock201.innerText = timeLimit/1000;
+            countTime = timeLimit;
+        };
+        sensSelect.onchange = function(){
+            sensitivity = parseFloat(this.value);
+        };
+
+        for(i=0,len=timeOption.length; i<len; i++){
+            timeSelect.innerHTML += '<option style="color: #333;" value="'+timeOption[i]+'"'+(timeOption[i]===timeLimit/1000 ? 'selected' : '')+'>'+timeOption[i]+'秒</option>';
+        }
+        for(i=0,len=sensOption.length; i<len; i++){
+            sensSelect.innerHTML += '<option value="'+sensOption[i]+'"'+(sensOption[i]===sensitivity ? 'selected' : '')+'>'+sensOption[i]+'</option>';
+        }
+
+        div.appendChild(document.createTextNode('挑戰時間：'));
+        div.appendChild(timeSelect);
+        div.appendChild(document.createElement('p'));
+        div.appendChild(document.createTextNode('速度感應：'));
+        div.appendChild(sensSelect);
+
+        return div;
     }
 
     function reStat(){
         utils.addEvent(document, 'touchstart', touchStartFn, prevent);
-        utils.addClass(player201, 'on');
-        utils.removeClass(player202, 'on');
-        player203.className = player203Cls;
-        player202.removeAttribute('style');
-        player203.removeAttribute('style');
+        utils.addClass(goalie[0], 'on');
+        utils.removeClass(goalie[1], 'on');
+        goalie[2].className = goalie203Cls;
+        goalie[1].removeAttribute('style');
+        goalie[2].removeAttribute('style');
         ball201.removeAttribute('style');
     }
 
@@ -98,15 +146,15 @@ utils.ready(function () {
         speedY.splice(0, speedY.length);
         speedX.splice(0, speedX.length);
 
-        utils.addClass(player202, 'on');
-        utils.removeClass(player201, 'on');
+        utils.addClass(goalie[1], 'on');
+        utils.removeClass(goalie[0], 'on');
         utils.removeClass(steer, 'transition-3');
         utils.addClass(steer, 'touch');
 
         touchX = e.targetTouches[0].clientX;
         touchY = e.targetTouches[0].clientY;
-        pw202 = player202.offsetWidth;
-        pw203 = player203.offsetWidth;
+        pw202 = goalie[1].offsetWidth;
+        pw203 = goalie[2].offsetWidth;
         gl = goal201.offsetLeft;
         gt = goal201.offsetTop;
         gw = goal201.offsetWidth;
@@ -125,8 +173,8 @@ utils.ready(function () {
         touchY = e.targetTouches[0].clientY;
 
         if(touchX > gl+pw202/3 && touchX < gl+gw-pw202/3){
-            player202.style.left = touchX - pw202/2 + 'px';
-            player203.style.left = touchX - pw203/2 + 'px';
+            goalie[1].style.left = touchX - pw202/2 + 'px';
+            goalie[2].style.left = touchX - pw203/2 + 'px';
         }
 
         steer.style.transform = 'rotateZ('+(-Math.atan((touchX-ballCenter[0])/(touchY-ballCenter[1])) * 180 / Math.PI)+'deg)';
@@ -134,6 +182,7 @@ utils.ready(function () {
         speedX.push(touchX);
         speedY.push(touchY);
     }
+
     function touchEndFn(){
         utils.removeEvent(document, 'touchmove', touchMoveFn);
         utils.removeEvent(document, 'touchend', touchEndFn);
@@ -158,9 +207,9 @@ utils.ready(function () {
         if(isNaN(x)) x = 0;
         if(isNaN(y)) y = 0;
 
-        utils.addClass(player203, 'on');
-        utils.removeClass(player201, 'on');
-        utils.removeClass(player202, 'on');
+        utils.addClass(goalie[2], 'on');
+        utils.removeClass(goalie[0], 'on');
+        utils.removeClass(goalie[1], 'on');
         utils.addClass(steer, 'transition-3');
         utils.removeClass(steer, 'touch');
 
@@ -175,10 +224,10 @@ utils.ready(function () {
             deg = 0;
         }
         if(rand1 > .66){
-            utils.addClass(player203, 'jump-left-'+deg);
+            utils.addClass(goalie[2], 'jump-left-'+deg);
             stat = deg === 0 ? 0 : 1;
         }else if(rand1 < .33){
-            utils.addClass(player203, 'jump-right-'+deg);
+            utils.addClass(goalie[2], 'jump-right-'+deg);
             stat = deg === 0 ? 0 : 2;
         }else{
             stat = 0;
@@ -216,10 +265,10 @@ utils.ready(function () {
                 if(left>gl && left<gl+gw-bw && top>gt && top<gt+gh-bw){
                     var ctx = cv.getContext('2d'),
                         binfo = ball201.getBoundingClientRect(),
-                        pl = player203.offsetLeft,
-                        pt = player203.offsetTop,
-                        pw = player203.offsetWidth,
-                        ph = player203.offsetHeight,
+                        pl = goalie[2].offsetLeft,
+                        pt = goalie[2].offsetTop,
+                        pw = goalie[2].offsetWidth,
+                        ph = goalie[2].offsetHeight,
                         bimg = new Image(),
                         pimg = new Image(),
                         ox = pl+pw/2,
@@ -231,7 +280,7 @@ utils.ready(function () {
                     cv.height = vH;
 
                     bimg.src = ball201.src;
-                    pimg.src = player203.src;
+                    pimg.src = goalie[2].src;
 
                     ctx.drawImage(bimg,binfo.left,binfo.top,bw,ball201.offsetHeight);
                     ctx.translate(ox, oy);
@@ -259,8 +308,8 @@ utils.ready(function () {
             }else{
                 timer = requestFrame(re);
             }
-            x *= .9;
-            y *= .9;
+            x *= sensitivity;
+            y *= sensitivity;
 
             top += y;
             left += x;
@@ -303,13 +352,16 @@ utils.ready(function () {
         turnScene(1);
     };
 
+    var sharePopup = utils.popup({
+        background: 'rgba(0,0,0,.7)',
+        color: '#fff'
+    });
     share301.onclick = function(){
         if(/MicroMessenger/i.test(window.navigator.userAgent)){
-            dialogIn.innerHTML = '<span>請點擊微信右上角菜單選擇分享。</span>';
+            sharePopup.show('<span class="popup-inner">請點擊微信右上角菜單選擇分享。</span>');
         }else{
-            dialogIn.innerHTML = '<span>請點擊瀏覽分享菜單進行分享。</span>';
+            sharePopup.show('<span class="popup-inner">請點擊瀏覽分享菜單進行分享。</span>');
         }
-        utils.addClass(dialog, 'show');
     }
 
 });

@@ -164,24 +164,24 @@ body{
     right: 0;
 }
 
-.player{
+.goalie{
     position: absolute;
     bottom: 53%;
     opacity: 0;
 }
-.player201{
+.goalie201{
     width: 34%;
     left: 33%;
 }
-.player202{
+.goalie202{
     width: 45%;
     left: 27.5%;
 }
-.player203{
+.goalie203{
     width: 15%;
     left: 42.5%;
 }
-.player.on{
+.goalie.on{
     opacity: 1;
 }
 
@@ -336,6 +336,14 @@ body{
 
 .popup-inner{
     display: inline-block;
-    text-align: left;
-    padding: .5em;
+    text-align: justify;
+    padding: .5em 1em;
+    max-width: 80%;
+}
+.setting-select{
+    background: transparent;
+    color: #fff;
+}
+.setting-select option{
+    color: #333;
 }

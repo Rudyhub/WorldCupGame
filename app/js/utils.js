@@ -81,6 +81,7 @@ var utils = {
         return false;
     },
     css: function(el,o){
+        if(typeof o !== 'object') return;
         for(var k in o){
             if(k === 'transform' || k === 'animation'){
                 var str = k.slice(0,1).toUpperCase() + k.slice(1);
@@ -91,9 +92,10 @@ var utils = {
             }
         }
     },
-    popup: function(){
+    popup: function(o){
         var div = document.createElement('div'),
             cell = document.createElement('div');
+
         this.css(div, {
             position: 'fixed',
             top: 0,
@@ -101,19 +103,21 @@ var utils = {
             width: '100%',
             height: '100%',
             background: '#fff',
+            color: '#333',
             display: 'table',
             zIndex: 100
         });
         this.css(cell, {
             display: 'table-cell',
             verticalAlign: 'middle',
-            textAlign: 'center',
-            color: '#333'
+            textAlign: 'center'
         });
+
+        this.css(div, o);
+
         div.appendChild(cell);
         div.onclick = function (ev) {
             if(ev.target === div || ev.target === cell){
-                div.onclick = null;
                 document.body.removeChild(div);
             }
         };
@@ -143,9 +147,10 @@ var utils = {
         });
         div.innerHTML = 'loading...0%';
         popup.show(div);
-        this.loadImage(['again.png','ball.png', 'bg201.jpg','bg301.jpg', 'p101.jpg', 'p102.jpg',
-            'p103.png','p104.png','p301.png','p302.png','p303.png', 'player02.png', 'player02.png',
-            'player03.png', 'pointer.png', 'share.png','steer.png'], function (cur, total) {
+        this.loadImage(['again.png','ball.png', 'bg201.jpg','bg301.jpg',
+            'p101.jpg', 'p102.jpg','p103.png','p104.png','p301.png','p302.png','p303.png',
+            'goalie01.png', 'goalie02.png','goalie03.png',
+            'pointer.png', 'share.png','steer.png'], function (cur, total) {
             if(cur === total){
                 popup.hide();
                 if(complete) complete();
