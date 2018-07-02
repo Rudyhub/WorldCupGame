@@ -117,6 +117,13 @@ body{
     background: url("../img/bg201.jpg") no-repeat center top;
     -webkit-background-size: 100% 100%;
     background-size: 100% 100%;
+    opacity: 0;
+}
+.scene-2.on{
+    -webkit-animation: slide-down 1s;
+    animation: slide-down 1s;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
 }
 .ball201{
     display: block;
@@ -327,29 +334,8 @@ body{
     transform-origin: bottom center;
 }
 
-.dialog{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, .5);
-    display: none;
-    top: 0;
-    left: 0;
-    font-size: 20px;
-    z-index: 100;
-}
-.dialog.show{
-    display: table;
-}
-.dialog span{
+.popup-inner{
     display: inline-block;
     text-align: left;
     padding: .5em;
-}
-
-.dialog-inner{
-    display: table-cell;
-    color: #fff;
-    text-align: center;
-    vertical-align: middle;
 }

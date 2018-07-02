@@ -9,11 +9,13 @@
     <meta name="description" content="一起世界杯，來射門比賽">
     <link rel="stylesheet" href="./css/animation.css">
     <link rel="stylesheet" href="./css/index.css?v=2.0">
+    <script src="js/utils.js"></script>
+    <script src="js/index.js?v=2.0"></script>
 </head>
 <body>
 <div class="cover"><img src="img/cover.jpg" alt="logo"></div>
 <div class="layout">
-    <div id="scene1" class="scene-1">
+    <div class="scene scene-1">
         <div class="bg101"></div>
         <div class="bg102"></div>
         <div class="pos1">
@@ -22,7 +24,7 @@
             <img id="btn101" class="p103" src="img/p103.png" alt="">
         </div>
     </div>
-    <div id="scene2" class="scene-2">
+    <div class="scene scene-2">
         <div class="score201">得分 <b id="score201">0</b></div>
         <div class="clock201">倒計時 <b id="clock201">10</b></div>
         <img id="player201" class="player player201" src="img/player01.png" alt="">
@@ -35,7 +37,7 @@
         <div id="goal201" class="goal201"></div>
         <canvas id="cv"></canvas>
     </div>
-    <div id="scene3" class="scene-3">
+    <div class="scene scene-3">
         <div class="p301-box">
             <img class="p301" src="img/p301.png" alt="">
             <img id="statTxt302" class="p302" src="img/p302.png" alt="">
@@ -47,10 +49,6 @@
             <img id="share301" class="share" src="img/share.png" alt="">
         </div>
     </div>
-    <div id="dialog" class="dialog">
-        <div class="dialog-inner"></div>
-    </div>
 </div>
-<script src="js/index.js?v=2.0"></script>
 </body>
 </html>
